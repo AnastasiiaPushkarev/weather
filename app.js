@@ -1,11 +1,22 @@
 const express = require('express'); //add express module
 const https = require("https");
+const bodyParser = require("body-parser");
 
 const app = express();//initialize new express app
 
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.get("/", function(req, res){
-    const url = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=Kingston, ON, CA&appid=c6a6f51867cd07a6784e02c37cc6394d";
+
+    res.sendFile(__dirname + "/index.html"); //+ index.html
     
+});
+
+app.post("/", function(req, res){
+    
+    const query = req.body.cityName;
+    const url = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=" + query + "&appid=c6a6f51867cd07a6784e02c37cc6394d";
+
     https.get(url, function(response){
         console.log(response.statusCode);
 
@@ -16,14 +27,14 @@ app.get("/", function(req, res){
             const icon = weatherData.weather[0].icon;
             const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
             res.write("<p>The weather is currently " + weatherDescription + "</p>");
-            res.write("<h1>The temperature in Kingston, ON is " + temp + " degrees Celcius.</h1>");
+            res.write("<h1>The temperature in " + query + " is " + temp + " degrees Celcius.</h1>");
             res.write("<img src=" + imageURL +">");
             res.send();
         })
     })
+});
 
-    // res.send("Server is up and running.")
-})
+
 
 
 
